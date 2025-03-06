@@ -18,13 +18,18 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])->name('admin.login.submit'); // Admin Login Action
     Route::get('/logout', [LoginController::class, 'logout'])->name('admin.logout'); // Admin Logout
 
-    Route::middleware(['auth.admin'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard'); // Admin Dashboard Route (Protected)
-    });
+    // Route::middleware(['auth.admin'])->group(function () {
+    //     Route::get('/dashboard', function () {
+    //         return view('admin.dashboard');
+    //     })->name('admin.dashboard'); // Admin Dashboard Route (Protected)
+    // });
+// ye wrong but abhi ke liye
+    Route::get('/dashboard', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+
+
+
 });
 
-// Route::get('/dashboard', function () {
-//     return view('admin.dashboard');
-// })->name('admin.dashboard');
+
