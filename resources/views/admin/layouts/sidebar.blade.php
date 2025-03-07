@@ -10,21 +10,21 @@
             <li class="menu-title" data-key="t-menu">Menu</li>
 
             <li>
-                <a href="index.html">
+                <a href="{{ route('admin.dashboard') }}">
                     <i data-feather="home"></i>
                     <span data-key="t-dashboard">Dashboard</span>
                 </a>
             </li>
 
             <li>
-                <a href="Users.html">
+                <a href="{{ route('admin.users') }}">
                     <i data-feather="users"></i>
                     <span data-key="t-dashboard">Users</span>
                 </a>
             </li>
 
             <li>
-                <a href="category.html">
+                <a href="{{ route('admin.categories.index') }}">
                     <i data-feather="share-2"></i>
                     <span data-key="t-dashboard">Category</span>
                 </a>
@@ -32,7 +32,7 @@
 
 
             <li>
-                <a href="sub-category.html" >
+            <a href="{{ route('admin.subcategories.index') }}">
                      <i data-feather="file-text"></i>
                     <span data-key="t-dashboard">Sub Category</span>
                 </a>
@@ -46,13 +46,13 @@
                 </a>
                 <ul class="sub-menu" aria-expanded="false">
                     <li>
-                        <a href="product-listing.html">
+                        <a href="{{ route('admin.product_listing') }}">
                             <span data-key="t-calendar">Product Listing</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="demand-listing.html">
+                        <a href="{{ route('admin.demand_listing') }}">
                             <span data-key="t-chat">Demand Listing</span>
                         </a>
                     </li>
@@ -61,7 +61,7 @@
             </li>
 
             <li>
-                <a href="product-for-sell.html" >
+                <a href="{{ route('admin.products.index') }}" >
                     <i data-feather="briefcase"></i>
                     <span data-key="t-dashboard">Product for Sell</span>
                 </a>
@@ -69,7 +69,7 @@
 
 
             <li>
-                <a href="orders.html" >
+                <a href="{{ route('admin.order') }}" >
                     <i data-feather="users"></i>
                     <span data-key="t-dashboard">Orders</span>
                 </a>
@@ -81,14 +81,16 @@
                     <span data-key="t-authentication">Enquiry</span>
                 </a>
                 <ul class="sub-menu" aria-expanded="false">
-                    <li><a href="for-requirments.html" data-key="t-login">For Requirement </a></li>
-                    <li><a href="for-demand.html" data-key="t-register">For Demand</a></li>
+                    <li><a href="{{ route('admin.requirement') }}" data-key="t-login">For Requirement </a></li>
+                    <li><a href="{{ route('admin.demand') }}" data-key="t-register">For Demand</a></li>
                    
                 </ul>
             </li>
 
+            
+
             <li>
-                <a href="banner.html">
+                <a href="{{ route('admin.banners.index') }}">
                     <i data-feather="pie-chart"></i>
                     <span data-key="t-dashboard">Banner</span>
                 </a>

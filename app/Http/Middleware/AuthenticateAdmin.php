@@ -11,7 +11,7 @@ class AuthenticateAdmin
     public function handle(Request $request, Closure $next)
     {
         if (!Auth::guard('admin')->check()) {
-            return redirect()->route('admin.login')->withErrors(['error' => 'You must be logged in.']);
+            return redirect()->route('admin.login'); // ✅ Admin Login Page pe Redirect
         }
 
         return $next($request);

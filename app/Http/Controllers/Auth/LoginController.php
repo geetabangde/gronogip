@@ -26,34 +26,30 @@ class LoginController extends Controller
     
 
     public function login(Request $request)
-    {
-        // dd($request->all());
-        // Validate request data
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:6',
-        ]);
+{
+    // Validate request data
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|min:6',
+    ]);
 
-        // Check if admin exists, if not create a new one
-        $admin = Admin::firstOrCreate(
-            ['email' => $request->email],
-            [
-                'name' => 'Default Admin', // You can change this to dynamic value
-                'password' => Hash::make($request->password), // Hash password
-            ]
-        );
-       
-        // dd($admin);
-        // dd(Auth::guard('admin'));
+    // Check if admin exists
+    $admin = Admin::where('email', $request->email)->first();
+
+    if (!$admin) {
+        return back()->withErrors(['email' => 'Admin not found.']); // ✅ Admin exists nahi to error
+    }
+
+    // Attempt login only if admin exists
+    if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    return back()->withErrors(['email' => 'Invalid credentials.']); // ✅ Agar password galat to error
+}
+
+
         
-        if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
-        //    dd(Auth::guard('admin'));
-            return redirect()->route('admin.dashboard');
-        }
-
-            return back()->withErrors(['email' => 'Invalid credentials.']);
-        }
-
         public function logout(Request $request)
         {
             Auth::guard('admin')->logout();
