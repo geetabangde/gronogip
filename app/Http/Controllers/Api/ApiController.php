@@ -206,8 +206,10 @@ class ApiController extends Controller
     }
 
     // ✅ Agar city wise product details
+    
     public function getProductsBySubcategory($id)
     {
+        // Check if subcategory has products
         $products = Product::where('subcategory_id', $id)
             ->with(['subcategory', 'user'])
             ->get()
@@ -225,14 +227,27 @@ class ApiController extends Controller
                 ];
             });
 
+        // If no products found, return empty array
+        if ($products->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No products found for this subcategory.',
+                'subcategory_id' => $id,
+                'products' => []
+            ], 404);
+        }
+
+        // If products found, return response
         return response()->json([
             'status' => true,
             'subcategory_id' => $id,
             'products' => $products,
         ]);
     }
-
 }
+
+
+
 
 
 

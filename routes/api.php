@@ -16,5 +16,5 @@ Route::get('/banners', [ApiController::class, 'getBanners']); // ✅ GET Banners
 Route::get('/categories', [ApiController::class, 'getCategories']);  // ✅ GET All Categories API
 Route::get('/categories/{category_id}/subcategories', [ApiController::class, 'getSubcategoriesByCategory']); // ✅ GET Categories wise SUbCategories API
 Route::get('/products', [ApiController::class, 'getFilteredProducts']); // ✅ GET All subcatogorywise product API
-Route::get('/subcategory/{subcategory_id}/products', [ApiController::class, 'getProductsBySubcategory']);
+Route::get('/subcategory/{id}/products', [ApiController::class, 'getProductsBySubcategory']);
 
