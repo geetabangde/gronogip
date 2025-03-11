@@ -77,10 +77,7 @@ Route::get('/', function () {
             Route::post('/update/{id}', [ProductController::class, 'update'])->name('admin.products.update');
             Route::delete('/delete/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
         });
-        
-        
-   
-    });
+});
 
 
 

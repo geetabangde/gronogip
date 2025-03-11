@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator; // ✅ Validator import karein
+use Illuminate\Support\Facades\Session;
 use App\Models\User; // ✅ User Model import karein
 use App\Models\Banner; // ✅ Banner Model import karein
 use App\Models\Category; // ✅ Category Model import karein
 use App\Models\Subcategory;  // ✅ SubCategory Model import karein
 use App\Models\Product; // ✅ Product Model import karein
+use App\Models\ProductSell; // ✅ Product Model import karein
+use App\Models\ProductListing; // ✅ ProductListing Model import karein
+use App\Models\DemandListing; // ✅ DemandListing Model import karein
 
 class ApiController extends Controller
 {
@@ -206,7 +210,6 @@ class ApiController extends Controller
     }
 
     // ✅ Agar city wise product details
-    
     public function getProductsBySubcategory($id)
     {
         // Check if subcategory has products
@@ -244,7 +247,332 @@ class ApiController extends Controller
             'products' => $products,
         ]);
     }
-}
+
+    // product for sell
+
+   // ✅ 1. Get All Products
+   
+       // Get all products
+       public function allProducts()
+       {
+           $productsell = ProductSell::all();
+           
+           return response()->json(['status' => true, 'products' => $productsell]);
+       }
+   
+       // Add a new product
+       public function store(Request $request)
+       {
+      
+           $request->validate([
+               'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+               'product_name' => 'required|string|max:255',
+               'price' => 'required|string|max:50',
+               
+           ]);
+       
+           $imagePath = null;
+           if ($request->hasFile('image')) {
+               $imagePath = $request->file('image')->store('products', 'public');
+           }
+       
+           // ✅ Ensure quantity is optional but default to 1 if not provided
+           $quantity = $request->has('quantity') ? $request->quantity : 1;
+       
+           // ✅ Store product in database
+           $product = ProductSell::create([
+               'image' => $imagePath,
+               'product_name' => $request->product_name,
+               'quantity' => $quantity, // ✅ Ensure quantity is set
+               'price' => $request->price,
+               'description' => $request->description,
+           ]);
+       
+           // ✅ Return JSON Response
+           return response()->json([
+               'status' => true,
+               'message' => 'Product added successfully',
+               'product' => $product
+           ], 201);
+       }
+       
+   
+       // Update a product
+    public function update(Request $request,$id)
+    {
+    // dd($request->all());
+    try {
+        // Find the product by ID
+        $productsell = ProductSell::find($id);
+        if (!$productsell) {
+            return response()->json(['status' => false, 'message' => 'Product not found'], 404);
+        }
+
+        // Debugging: Log request data
+        \Log::info('Update Request Data:', $request->all());
+
+        // Validate request data
+        $request->validate([
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'product_name' => 'sometimes|string|max:255',
+            'quantity' => 'sometimes|integer|min:1',
+            'price' => 'sometimes|string|max:50',
+            'description' => 'nullable|string',
+        ]);
+
+        // Handle Image Upload if provided
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $productsell->image = $imagePath;
+        }
+
+        // Update fields only if they are provided
+        if ($request->filled('product_name')) {
+            $productsell->product_name = $request->product_name;
+        }
+        if ($request->filled('quantity')) {
+            $productsell->quantity = $request->quantity;
+        }
+        if ($request->filled('price')) {
+            $productsell->price = $request->price;
+        }
+        if ($request->filled('description')) {
+            $productsell->description = $request->description;
+        }
+
+        // Save updated data
+        $productsell->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Product updated successfully',
+            'product' => $productsell
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Update Error: '.$e->getMessage());
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong!',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+    }
+
+//   delete product
+    public function destroy($id)
+    {
+        Log::info("Delete request received for product ID: " . $id);
+
+        $productsell = ProductSell::find($id);
+        if (!$productsell) {
+            Log::error("Product with ID $id not found!");
+            return response()->json(['status' => false, 'message' => 'Product not found'], 404);
+        }
+
+        $productsell->delete();
+        Log::info("Product deleted successfully.");
+
+        return response()->json(['status' => true, 'message' => 'Product deleted successfully']);
+    }
+
+    public function getFeaturedProducts()
+    {
+        $featuredProducts = ProductSell::where('is_featured', 1)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Featured products fetched successfully',
+            'products' => $featuredProducts
+        ], 200);
+    }
+    
+    public function show($id)
+   {
+    // Find product by ID
+    $product = ProductSell::find($id);
+
+    // If not found, return error
+    if (!$product) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Product not found'
+        ], 404);
+    }
+
+    // Return product details
+    return response()->json([
+        'status' => true,
+        'message' => 'Product details fetched successfully',
+        'product' => $product
+    ], 200);
+
+   }
+
+   
+       public function getProductListingData()
+       {
+           // 1) Fetch subcategories (id, name)
+           $subcategories = Subcategory::all(['id', 'name']);
+   
+           // 2) Static units
+           $units = ['Kilogram', 'Quintal', 'Ton', 'Gram'];
+   
+           return response()->json([
+               'status' => true,
+               'message' => 'Product listing data fetched successfully',
+               'subcategories' => $subcategories,
+               'units' => $units
+           ], 200);
+       }
+   
+       /**
+        * 2. POST /product-listings
+        *    Stores a new product listing in the "product_listings" table.
+        */
+        public function storeProductListing(Request $request)
+      {
+        Log::info('Incoming product listing data:', $request->all());
+
+        $request->validate([
+            'subcategory_id' => 'required|exists:subcategories,id',
+            'quantity'       => 'required|integer|min:1',
+            'selling_rate'   => 'required|string|max:50',
+            'per_unit'       => 'required|string|max:50',
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        
+           $imagePath = null;
+           if ($request->hasFile('image')) {
+               $imagePath = $request->file('image')->store('products', 'public');
+               Log::info("Image stored at: $imagePath");Log::info("Image stored at: $imagePath");
+               Log::info("Image stored at: $imagePath");
+           }
+
+        $listing = ProductListing::create([
+            'subcategory_id' => $request->subcategory_id,
+            'quantity'       => $request->quantity,
+            'selling_rate'   => $request->selling_rate,
+            'per_unit'       => $request->per_unit,
+            'image'          => $imagePath,
+        ]);
+
+        Log::info("Product listing created: ID {$listing->id}");
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Product listing created successfully',
+            'data'    => $listing
+        ], 201);
+      }
+
+     
+
+   /**
+     * Store a new demand listing.
+     */
+   
+
+
+     public function storeDroductListing(Request $request)
+    {   
+        // dd($request->all());
+        Log::info('Incoming demand listing data:', $request->all());
+
+        // Validate required fields
+        $request->validate([
+            'subcategory_id' => 'required|exists:subcategories,id',
+            'user_id'        => 'required|exists:users,id',
+            'quantity'       => 'required|integer|min:1',
+            'delivary_date'  => 'nullable|date',
+            'notes'          => 'nullable|string',
+            'selling_rate'   => 'nullable|string|max:50',
+            'per_unit'       => 'nullable|string|max:50',
+            'unit'           => 'nullable|string|max:50',
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // 1) Find the user (to get mobile_number & city)
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'User not found'], 404);
+        }
+
+        // 2) Handle image upload if provided
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('demand_images', 'public');
+            Log::info("Demand listing image stored at: $imagePath");
+        }
+
+        // 3) Create the demand listing
+        $demand = DemandListing::create([
+            'subcategory_id'  => $request->subcategory_id,
+            'user_id'         => $request->user_id,
+            'quantity'        => $request->quantity,
+            'delivary_date'   => $request->delivary_date,
+            'notes'           => $request->notes,
+            'selling_rate'    => $request->selling_rate,
+            'per_unit'        => $request->per_unit,
+            'unit'            => $request->unit,
+            'image'           => $imagePath,
+
+            // 4) Auto-fill from user table
+            'contact_details' => $user->mobile_number, // e.g. from "mobile_number" column
+            'location'        => $user->city,          // e.g. from "city" column
+        ]);
+
+        Log::info("Demand listing created: ID {$demand->id}");
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Demand listing created successfully',
+            'data'    => $demand
+        ], 201);
+    }
+
+    
+    
+    /**
+     * Show all demand listings in a feed.
+     */
+    public function DemandListing()
+    {
+        // 1) Fetch all demands, eager-load subcategory & user
+        //    so we can display subcategory name & user city, etc.
+        $demands = DemandListing::with(['subcategory', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // 2) Transform each demand item to the shape you need
+        //    e.g., commodity, target price, location, time_ago, etc.
+        $data = $demands->map(function ($demand) {
+            return [
+                'id'           => $demand->id,
+                'commodity'    => optional($demand->subcategory)->name, // subcategory name
+                'target_price' => $demand->selling_rate,                // e.g. "150"
+                'quantity'     => $demand->quantity,                    // e.g. 20
+                'location'     => optional($demand->user)->city,        // from user table
+                'time_ago'     => $demand->created_at->diffForHumans(), // e.g. "3 hours ago"
+                // Add more fields if needed (delivery_date, contact_details, etc.)
+            ];
+        });
+
+        // 3) Return as JSON
+        return response()->json([
+            'status'  => true,
+            'message' => 'Demand listings fetched successfully',
+            'data'    => $data
+        ], 200);
+    }
+
+
+
+
+    }
+   
+
+
 
 
 
