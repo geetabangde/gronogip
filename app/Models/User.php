@@ -23,7 +23,8 @@ class User extends Authenticatable
         'mobile_number',
         'address',
         'city',
-        'otp'
+        'otp',
+        'refer_code'
     ];
 
     /**

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator; // ✅ Validator import karein
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 use App\Models\User; // ✅ User Model import karein
 use App\Models\Banner; // ✅ Banner Model import karein
 use App\Models\Category; // ✅ Category Model import karein
@@ -15,6 +16,8 @@ use App\Models\Product; // ✅ Product Model import karein
 use App\Models\ProductSell; // ✅ Product Model import karein
 use App\Models\ProductListing; // ✅ ProductListing Model import karein
 use App\Models\DemandListing; // ✅ DemandListing Model import karein
+use App\Models\ReferEarn;  // ✅ ReferEarn Model import karein
+use App\Models\RedeemProduct; // ✅ RedeemProduct Model import karein
 
 class ApiController extends Controller
 {
@@ -26,12 +29,11 @@ class ApiController extends Controller
     // ✅ Mobile Number se Register aur OTP Generate
 
     public function register(Request $request)
-    {
-        
+    {   
+        // dd($request->all());
+
         $validator = Validator::make($request->all(), [
-           
-            'mobile_number' => 'required|string|max:20|unique:users',
-            
+           'mobile_number' => 'required|string|max:20|unique:users',
         ]);
     
         if ($validator->fails()) {
@@ -52,10 +54,11 @@ class ApiController extends Controller
             'mobile_number' => $request->mobile_number,
             'address' => $request->address,
             'city' => $request->city,
+            'refer_code' => $request->refer_code,
         ]);
 
         // dd($user,5992310986,621335);
-    
+        // dd($user);
 
         // ✅ Send OTP ka Placeholder (SMS Service Use Kar Sakte Hain)
         // Example: sendOtpToMobile($request->mobile_number, $otp);
@@ -358,7 +361,7 @@ class ApiController extends Controller
     }
     }
 
-//   delete product
+    //   delete product
     public function destroy($id)
     {
         Log::info("Delete request received for product ID: " . $id);
@@ -565,11 +568,172 @@ class ApiController extends Controller
             'data'    => $data
         ], 200);
     }
+    
+    // referUser code
+    public function applyReferral(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'refer_code' => 'required|exists:users,refer_code',
+            'subcategory_id' => 'required|exists:subcategories,id',
+        ]);
 
+        // User B (jo refer code apply kar raha hai)
+        $referredUser = User::find($request->user_id);
 
+        // User A (jisne refer code diya hai)
+        $referrer = User::where('refer_code', $request->refer_code)->first();
 
+        if (!$referrer) {
+            return response()->json(['message' => 'Invalid referral code!'], 400);
+        }
 
+        DB::beginTransaction();
+        try {
+            // 1️⃣ User A ko 200 points dena
+            $referrer->increment('reward_points', 200);
+
+            // 2️⃣ User B ko 100 points dena
+            $referredUser->increment('reward_points', 100);
+
+            // 3️⃣ Refer Earn table me entry save karna
+            ReferEarn::create([
+                'user_id' => $referrer->id,
+                'referred_user_id' => $referredUser->id,
+                'subcategory_id' => $request->subcategory_id,
+                'reward_points' => 100, // Referred user ke points track ke liye
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => 'Referral applied successfully!'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Something went wrong!'], 500);
+        }
     }
+
+    // reedemproduct
+
+    // Get all products
+    public function allredeemproducts()
+    {
+        $productredeem = RedeemProduct::all();
+        
+        return response()->json(['status' => true, 'products' => $productredeem]);
+    }
+
+    // Add a new product
+    public function storeRedeem(Request $request)
+    {
+   
+        $request->validate([
+            'redeem_product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'redeem_product_name' => 'required|string|max:255',
+            'redeem_product_coins' => 'required|string|max:50',
+            
+        ]);
+    
+        $imagePath = null;
+        if ($request->hasFile('redeem_product_image')) {
+            $imagePath = $request->file('redeem_product_image')->store('products', 'public');
+        }
+    
+        
+        // ✅ Store product in database
+        $redeemproduct = RedeemProduct::create([
+            'redeem_product_image' => $imagePath,
+            'redeem_product_name' => $request->redeem_product_name,
+            'redeem_product_coins' => $request->redeem_product_coins,
+            'redeem_product_description' => $request->redeem_product_description,
+        ]);
+    
+        // ✅ Return JSON Response
+        return response()->json([
+            'status' => true,
+            'message' => 'Redeem Product added successfully',
+            'product' => $redeemproduct
+        ], 201);
+    }
+    
+
+    // Update a product
+    public function updateredeemproducts(Request $request, $id)
+   {
+    try {
+        // Find the product by ID
+        $productredeem = RedeemProduct::find($id);
+        if (!$productredeem) {
+            return response()->json(['status' => false, 'message' => 'Product not found'], 404);
+        }
+
+        // Debugging: Log request data
+        \Log::info('Update Request Data:', $request->all());
+
+        // Validate request data
+        $request->validate([
+            'redeem_product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // ✅ FIXED
+            'redeem_product_name' => 'sometimes|string|max:255',
+            'redeem_product_coins' => 'sometimes|string|max:50',
+            'redeem_product_description' => 'nullable|string',
+        ]);
+
+        // Handle Image Upload if provided
+        if ($request->hasFile('redeem_product_image')) {
+            $imagePath = $request->file('redeem_product_image')->store('products', 'public');
+            $productredeem->redeem_product_image = asset('storage/' . $imagePath); // ✅ FIXED
+        }
+
+        // Update fields only if they are provided
+        if ($request->filled('redeem_product_name')) {
+            $productredeem->redeem_product_name = $request->redeem_product_name;
+        }
+        
+        if ($request->filled('redeem_product_coins')) {
+            $productredeem->redeem_product_coins = $request->redeem_product_coins;
+        }
+        
+        if ($request->filled('redeem_product_description')) {
+            $productredeem->redeem_product_description = $request->redeem_product_description;
+        }
+
+        // Save updated data
+        $productredeem->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Product Redeem updated successfully',
+            'product' => $productredeem
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Update Error: '.$e->getMessage());
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong!',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+   }
+
+
+ //   delete product
+    public function destroyredeem($id)
+    {
+        Log::info("Delete request received for product ID: " . $id);
+
+        $productredeem = RedeemProduct::find($id);
+        if (!$productredeem) {
+            Log::error("Product with ID $id not found!");
+            return response()->json(['status' => false, 'message' => 'Product not found'], 404);
+        }
+
+        $productredeem->delete();
+        Log::info("Product Redeem deleted successfully.");
+
+        return response()->json(['status' => true, 'message' => 'Product Redeem deleted successfully']);
+    }
+
+
+}
    
 
 
