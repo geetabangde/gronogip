@@ -12,6 +12,13 @@ Route::get('/test-api', function () {
 Route::post('register', [ApiController::class, 'register']); // ✅ Mobile se Register
 Route::post('verify-otp', [ApiController::class, 'verifyOtp']); // ✅ OTP Verify
 Route::post('login', [ApiController::class, 'loginWithMobile']); // ✅ Mobile Se Login API
+
+Route::middleware(['auth:sanctum'])->group(function (){
+    Route::post('logout', [ApiController::class, 'logout']);
+    Route::get('profile', [ApiController::class, 'profile']);
+    
+});
+
 Route::get('/banners', [ApiController::class, 'getBanners']); // ✅ GET Banners API
 Route::get('/categories', [ApiController::class, 'getCategories']);  // ✅ GET All Categories API
 Route::get('/categories/{category_id}/subcategories', [ApiController::class, 'getSubcategoriesByCategory']); // ✅ GET Categories wise SUbCategories API
@@ -30,6 +37,10 @@ Route::get('/redeemproducts', [ApiController::class, 'allredeemproducts']); // G
 Route::post('/allredeemproducts', [ApiController::class, 'storeRedeem']); // Add a product
 Route::post('/redeemproducts/{id}', [ApiController::class, 'updateredeemproducts']); // Update a product
 Route::delete('/productsredeem/{id}', [ApiController::class, 'destroyredeem']); // Delete a product
+
+Route::post('/redeem', [ApiController::class, 'redeemProduct']); // Redeem product
+Route::post('/refer', [ApiController::class, 'referProduct']); // Refer product
+
 
 // FeaturedProducts
 Route::get('/featured-products', [ApiController::class, 'getFeaturedProducts']); // FeaturedProducts

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator; // ✅ Validator import karein
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
 use App\Models\User; // ✅ User Model import karein
 use App\Models\Banner; // ✅ Banner Model import karein
 use App\Models\Category; // ✅ Category Model import karein
@@ -18,6 +19,7 @@ use App\Models\ProductListing; // ✅ ProductListing Model import karein
 use App\Models\DemandListing; // ✅ DemandListing Model import karein
 use App\Models\ReferEarn;  // ✅ ReferEarn Model import karein
 use App\Models\RedeemProduct; // ✅ RedeemProduct Model import karein
+use App\Models\Redeem;  // ✅ Redeem Model import karein
 
 class ApiController extends Controller
 {
@@ -29,24 +31,23 @@ class ApiController extends Controller
     // ✅ Mobile Number se Register aur OTP Generate
 
     public function register(Request $request)
-    {   
-        // dd($request->all());
+{   
+    $validator = Validator::make($request->all(), [
+        'mobile_number' => 'required|string|max:20|unique:users',
+    ]);
 
-        $validator = Validator::make($request->all(), [
-           'mobile_number' => 'required|string|max:20|unique:users',
-        ]);
-    
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
 
-        // dd($request->all(6543210982,997236));
-        
-    
-        // ✅ OTP Generate karein
-        $otp = rand(100000, 999999);
-    
-        // ✅ User Create karein
+    // ✅ OTP Generate karein
+    $otp = rand(100000, 999999);
+
+    // ✅ Check if User already exists
+    $user = User::where('mobile_number', $request->mobile_number)->first();
+
+    if (!$user) {
+        // ✅ New User Create karein
         $user = User::create([
             'email' => $request->email,
             'name' => $request->name,
@@ -57,20 +58,29 @@ class ApiController extends Controller
             'refer_code' => $request->refer_code,
         ]);
 
-        // dd($user,5992310986,621335);
-        // dd($user);
-
-        // ✅ Send OTP ka Placeholder (SMS Service Use Kar Sakte Hain)
-        // Example: sendOtpToMobile($request->mobile_number, $otp);
-
-        return response()->json(['message' => 'OTP sent successfully', 'otp' => $otp], 201);
+        // ✅ Token Generate & Store Karein (सिर्फ पहली बार)
+        $token = $user->createToken('auth_token')->plainTextToken;
+        $user->update(['auth_token' => $token]);
+    } else {
+        // ✅ अगर पहले से टोकन है, तो वही वापस करें
+        $token = $user->auth_token;
     }
+
+    return response()->json([
+        'message' => 'OTP sent successfully',
+        'otp' => $otp,
+        'user' => $user,
+        'token' => $token  // ✅ पुराना टोकन या नया टोकन वापस भेज रहे हैं
+    ], 201);
+}
+
+
 
     // ✅ OTP Verify API
     public function verifyOtp(Request $request)
-   {
+    {
     try {
-        Log::info('Verify OTP Request:', $request->all()); // Debugging ke liye
+        Log::info('Verify OTP Request:', $request->all());
 
         $validator = Validator::make($request->all(), [
             'mobile_number' => 'required|string|max:20',
@@ -89,38 +99,82 @@ class ApiController extends Controller
             return response()->json(['message' => 'Invalid OTP'], 400);
         }
 
+        // ✅ OTP Verify hone ke baad, OTP null karein
         $user->update(['otp' => null]);
 
-        return response()->json(['message' => 'OTP verified successfully', 'user' => $user], 200);
-     } catch (\Exception $e) {
+        // ✅ पुराना टोकन वापस करें
+        return response()->json([
+            'message' => 'OTP verified successfully',
+            'user' => $user,
+            'token' => $user->auth_token  // ✅ पहले से स्टोर टोकन वापस भेज रहे हैं
+        ], 200);
+    } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
-     }
+    }
    }
 
    // ✅ Mobile Number Se Login API
+   
+
+
    public function loginWithMobile(Request $request)
    {
-       $validator = Validator::make($request->all(), [
-           'mobile_number' => 'required|string|max:20',
-       ]);
+    $validator = Validator::make($request->all(), [
+        'mobile_number' => 'required|string|max:20',
+    ]);
 
-       if ($validator->fails()) {
-           return response()->json(['errors' => $validator->errors()], 422);
-       }
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
 
-       $user = User::where('mobile_number', $request->mobile_number)->first();
+    $user = User::where('mobile_number', $request->mobile_number)->first();
 
-       if ($user) {
-           return response()->json([
-               'message' => 'Login successful',
-               'user' => $user
-           ], 200);
-       } else {
-           return response()->json([
-               'message' => 'Please register this account'
-           ], 404);
-       }
+    if ($user) {
+        // ✅ हर बार नया OTP जेनरेट करें
+        $otp = rand(100000, 999999);
+        $user->update(['otp' => $otp]); // ✅ OTP डेटाबेस में सेव करें
+
+        // ✅ पुराना टोकन वापस करें
+        return response()->json([
+            'message' => 'OTP sent successfully',
+            'otp' => $otp,  // ✅ हर बार नया OTP भेजें
+            'user' => $user,
+            'token' => $user->auth_token  // ✅ पहले से स्टोर टोकन वापस भेजें
+        ], 200);
+    } else {
+        return response()->json([
+            'message' => 'Please register this account'
+        ], 404);
+    }
    }
+   
+   public function profile(Request $request){
+    if($request->user()){
+        return response()->json([
+            'message' => 'Profile Fatched',
+            'data'=> $request->user()
+        ],200);
+    }else{
+        return response()->json([
+            'message' => 'Not Authenticated'
+        ],401);
+    }
+   }
+
+
+    public function logout(Request $request){
+        $user = User::where('id',$request->user()->id)->first();
+        if($user){
+            $user->tokens()->delete();
+            return response()->json([
+                'message' => 'Logged Out successfuly',
+            ],200);
+        }else{
+            return response()->json([
+                'message' => 'Use Not Found'
+            ],404);
+        }
+    }
 
    // ✅ Banner Api 
 
@@ -637,7 +691,8 @@ class ApiController extends Controller
         if ($request->hasFile('redeem_product_image')) {
             $imagePath = $request->file('redeem_product_image')->store('products', 'public');
         }
-    
+        
+       
         
         // ✅ Store product in database
         $redeemproduct = RedeemProduct::create([
@@ -732,6 +787,44 @@ class ApiController extends Controller
         return response()->json(['status' => true, 'message' => 'Product Redeem deleted successfully']);
     }
 
+    // reedem 
+    public function redeemProduct(Request $request)
+   {
+    $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'redeem_product_id' => 'required|exists:redeem_products,id',
+    ]);
+
+    $user = User::find($request->user_id);
+    $product = RedeemProduct::find($request->redeem_product_id);
+
+    if (!$user || !$product) {
+        return response()->json(['status' => false, 'message' => 'Invalid user or product'], 400);
+    }
+
+    if ($user->reward_points < $product->redeem_product_coins) {
+        return response()->json(['status' => false, 'message' => 'Not enough coins'], 400);
+    }
+
+    // **Deduct coins from user**
+    $user->reward_points -= $product->redeem_product_coins;
+    $user->save();
+
+    // **Store redeemed product in `redeemed_products` table**
+    $redeemedProduct = Redeem::create([
+        'user_id' => $user->id,
+        'redeem_product_id' => $product->id,
+        'coins_used' => $product->redeem_product_coins,
+    ]);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Product redeemed successfully',
+        'remaining_coins' => $user->reward_points,
+        'redeemed_product' => $redeemedProduct
+    ]);
+    
+   }
 
 }
    

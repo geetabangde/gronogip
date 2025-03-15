@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\ProductSell;
 use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,7 +13,7 @@ class ProductController extends Controller
     // Display all products
     public function index()
     {
-        $products = Product::with('category')->get();
+        $products = ProductSell::with('category')->get();
         $categories = Category::all();
 
         return view('admin.products.index', compact('products', 'categories'));
@@ -30,7 +31,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'name' => 'required|string|max:255',
+            'product_name' => 'required|string|max:255',
             // 'category_id' => 'required|exists:categories,id',
             'price' => 'required|string|max:50',
             'description' => 'nullable|string',
@@ -41,9 +42,9 @@ class ProductController extends Controller
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
-        Product::create([
+        ProductSell::create([
             'image' => $imagePath,
-            'name' => $request->name,
+            'product_name' => $request->product_name,
             // 'category_id' => $request->category_id,
             'price' => $request->price,
             'description' => $request->description,
@@ -64,19 +65,19 @@ class ProductController extends Controller
    {
     $request->validate([
         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'name' => 'required|string|max:255',
+        'product_name' => 'required|string|max:255',
         'price' => 'required|string|max:50',
         'description' => 'nullable|string',
     ]);
 
-    $product = Product::find($id);
+    $product = ProductSell::find($id);
 
     if (!$product) {
         return redirect()->route('admin.products.index')->with('error', 'Product not found.');
     }
 
     // Update fields
-    $product->name = $request->name;
+    $product->product_name = $request->product_name;
     $product->price = $request->price;
     $product->description = $request->description;
 
@@ -101,7 +102,7 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        $product = Product::find($id);
+        $product = ProductSell::find($id);
         if ($product) {
             $product->delete();
         }

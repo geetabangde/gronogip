@@ -8,11 +8,11 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0 font-size-18">Subcategory Management</h4>
+                    <h4 class="mb-sm-0 font-size-18">Product Management</h4>
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Subcategories</li>
+                            <li class="breadcrumb-item active">Product</li>
                         </ol>
                     </div>
                 </div>
@@ -22,7 +22,7 @@
         <!-- Add Subcategory Button -->
         <div class="d-flex justify-content-end mb-3">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubcategoryModal">
-                Add Subcategory
+                Add Product
             </button>
         </div>
 
@@ -33,7 +33,7 @@
                     <thead>
                         <tr>
                             <th>Image</th>
-                            <th>Subcategory Name</th>
+                            <th>Product Name</th>
                             <th>Category</th>
                             <th>Actions</th>
                         </tr>
@@ -60,14 +60,14 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addSubcategoryLabel">Add Subcategory</h5>
+                        <h5 class="modal-title" id="addSubcategoryLabel">Add Product</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="addSubcategoryForm">
                             @csrf
                             <div class="mb-3">
-                                <label class="form-label">Subcategory Name</label>
+                                <label class="form-label">Product Name</label>
                                 <input type="text" class="form-control" name="name" required>
                             </div>
                             <div class="mb-3">
@@ -79,12 +79,12 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Image</label>
+                                <label class="form-label">Product Image</label>
                                 <input type="file" class="form-control" name="image">
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Add Subcategory</button>
+                                <button type="submit" class="btn btn-primary">Add Product</button>
                             </div>
                         </form>
                     </div>
@@ -97,7 +97,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editSubcategoryLabel">Edit Subcategory</h5>
+                        <h5 class="modal-title" id="editSubcategoryLabel">Edit Product</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -105,7 +105,7 @@
                             @csrf
                             <input type="hidden" id="editSubcategoryId">
                             <div class="mb-3">
-                                <label class="form-label">Subcategory Name</label>
+                                <label class="form-label">Product Name</label>
                                 <input type="text" class="form-control" id="editSubcategoryName" name="name" required>
                             </div>
 
@@ -118,7 +118,7 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Subcategory Image</label>
+                                <label class="form-label">Product Image</label>
                                 <input type="file" class="form-control" id="editSubcategoryImage" name="image" accept="image/*">
                                 <img id="previewImage" src="" alt="Preview Image" class="mt-2" style="max-width: 100px; display: none;">
                             </div>
@@ -126,7 +126,7 @@
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Update Subcategory</button>
+                                <button type="submit" class="btn btn-primary">Update Product</button>
                             </div>
                         </form>
                     </div>
@@ -139,11 +139,11 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Delete Subcategory</h5>
+                        <h5 class="modal-title">Delete Product</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this subcategory?
+                        Are you sure you want to delete this Product?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

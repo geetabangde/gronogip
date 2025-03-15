@@ -46,14 +46,14 @@
                                                     <tr>
                                                         <td>{{ $product->id }}</td>
                                                         <td><img src="{{ asset('storage/'.$product->image) }}" alt="Product Image" class="img-thumbnail" width="50"></td>
-                                                        <td>{{ $product->name }}</td>
+                                                        <td>{{ $product->product_name }}</td>
                                                         <!-- <td>{{ $product->category ? $product->category->name : 'No Category' }}</td> -->
                                                         <td>{{ $product->price }}/kg</td>
                                                         <td>{{ $product->description }}</td>
                                                         <td>
                                                         <!-- data-category-id="{{ $product->category_id }}" -->
                                                             <button class="btn btn-warning btn-sm editBtn" data-id="{{ $product->id }}" 
-                                                                    data-name="{{ $product->name }}" 
+                                                                    data-name="{{ $product->product_name }}" 
                                                                      
                                                                     data-price="{{ $product->price }}" 
                                                                     data-description="{{ $product->description }}" 
@@ -155,7 +155,7 @@ $(document).ready(function () {
     // ✅ Add Product (AJAX)
     $("#saveProduct").click(function () {
         let formData = new FormData();
-        formData.append('name', $("#productName").val());
+        formData.append('product_name', $("#productName").val());
         formData.append('category_id', $("#categorySelect").val());
         formData.append('price', $("#productPrice").val());
         formData.append('description', $("#productDescription").val());
@@ -183,13 +183,13 @@ $(document).ready(function () {
 $(".editBtn").click(function () {
     let row = $(this).closest("tr");
     let id = $(this).data("id");
-    let name = $(this).data("name");
+    let product_name = $(this).data("product_name");
     let categoryId = $(this).data("category-id"); // ✅ Correct category data
     let price = $(this).data("price"); // ✅ Directly from button dataset
     let description = $(this).data("description");
 
     $("#editProductId").val(id);
-    $("#editProductName").val(name);
+    $("#editProductName").val(product_name);
     $("#editCategorySelect").val(categoryId); // ✅ Set category correctly
     $("#editProductPrice").val(price);
     $("#editProductDescription").val(description);
@@ -201,7 +201,7 @@ $(".editBtn").click(function () {
     $("#updateProduct").click(function () {
         let id = $("#editProductId").val();
         let formData = new FormData();
-        formData.append('name', $("#editProductName").val());
+        formData.append('product_name', $("#editProductName").val());
         formData.append('category_id', $("#editCategorySelect").val());
         formData.append('price', $("#editProductPrice").val());
         formData.append('description', $("#editProductDescription").val());

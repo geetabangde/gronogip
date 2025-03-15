@@ -34,7 +34,7 @@
             <li>
             <a href="{{ route('admin.subcategories.index') }}">
                      <i data-feather="file-text"></i>
-                    <span data-key="t-dashboard">Sub Category</span>
+                    <span data-key="t-dashboard">Product</span>
                 </a>
             </li>
 
