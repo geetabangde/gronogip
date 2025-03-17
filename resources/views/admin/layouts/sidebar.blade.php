@@ -34,7 +34,7 @@
             <li>
             <a href="{{ route('admin.subcategories.index') }}">
                      <i data-feather="file-text"></i>
-                    <span data-key="t-dashboard">Product</span>
+                    <span data-key="t-dashboard">Requirement Product</span>
                 </a>
             </li>
 
@@ -64,6 +64,13 @@
                 <a href="{{ route('admin.products.index') }}" >
                     <i data-feather="briefcase"></i>
                     <span data-key="t-dashboard">Product for Sell</span>
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ route('admin.redeem.index') }}" >
+                    <i data-feather="briefcase"></i>
+                    <span data-key="t-dashboard">Product Redeem</span>
                 </a>
             </li>
 

@@ -30,81 +30,28 @@
                                         <thead>
                                             <tr>
                                                 <th>Id</th>
-                                                <th>Crop Name</th>
+                                                <th>Demand product Name</th>
                                                 <th>Quantity</th>
                                                 <th>Preferred Delivery Date</th>
                                                 <th>Delivery Location</th>
                                                 <th>Contact Details</th>
-                                                <th>Additional Address</th>
-                                                <th>Actions</th>
+                                                <th>Selling Rate</th>
+                                                <th>Unit</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                           @foreach ($products as $product)
                                             <tr>
-                                                <td>1</td>
-                                                <td>Wheat</td>
-                                                <td>1000 Kg</td>
-                                                <td>2025-03-10</td>
-                                                <td>Indore, MP</td>
-                                                <td>9876543210</td>
-                                                <td>Near Bus Stand, Indore</td>
-                                                <td>
-                                                    <button class="btn btn-warning btn-sm">Edit</button>
-                                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                                </td>
+                                                <td>{{ $product->id }}</td>
+                                                <td>{{ $product->subcategory ? $product->subcategory->name : 'N/A' }}</td>
+                                                <td>{{ $product->quantity }}</td>
+                                                <td>{{ $product->delivary_date }}</td>
+                                                <td>{{ $product->user ? $product->user->city : 'N/A' }}</td>
+                                                <td>{{ $product->user ? $product->user->mobile_number : 'N/A' }}</td>
+                                                <td>₹{{ $product->selling_rate }}</td>
+                                                <td>{{ $product->per_unit }}</td>
                                             </tr>
-                                            <tr>
-                                                <td>2</td>
-                                                <td>Basmati Rice</td>
-                                                <td>500 Kg</td>
-                                                <td>2025-03-15</td>
-                                                <td>Bhopal, MP</td>
-                                                <td>9856231470</td>
-                                                <td>Sector 5, Bhopal</td>
-                                                <td>
-                                                    <button class="btn btn-warning btn-sm">Edit</button>
-                                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>3</td>
-                                                <td>Sugarcane</td>
-                                                <td>2000 Kg</td>
-                                                <td>2025-03-20</td>
-                                                <td>Pune, MH</td>
-                                                <td>9988776655</td>
-                                                <td>Market Yard, Pune</td>
-                                                <td>
-                                                    <button class="btn btn-warning btn-sm">Edit</button>
-                                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>4</td>
-                                                <td>Groundnut</td>
-                                                <td>1500 Kg</td>
-                                                <td>2025-03-12</td>
-                                                <td>Nashik, MH</td>
-                                                <td>9123456789</td>
-                                                <td>Main Road, Nashik</td>
-                                                <td>
-                                                    <button class="btn btn-warning btn-sm">Edit</button>
-                                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>5</td>
-                                                <td>Fresh Mango</td>
-                                                <td>800 Kg</td>
-                                                <td>2025-03-25</td>
-                                                <td>Jaipur, RJ</td>
-                                                <td>9001234567</td>
-                                                <td>Near Railway Station, Jaipur</td>
-                                                <td>
-                                                    <button class="btn btn-warning btn-sm">Edit</button>
-                                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                                </td>
-                                            </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>

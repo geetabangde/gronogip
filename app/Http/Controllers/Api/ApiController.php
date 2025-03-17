@@ -358,7 +358,7 @@ class ApiController extends Controller
     public function update(Request $request,$id)
     {
     // dd($request->all());
-    try {
+        try {
         // Find the product by ID
         $productsell = ProductSell::find($id);
         if (!$productsell) {
@@ -405,16 +405,34 @@ class ApiController extends Controller
             'message' => 'Product updated successfully',
             'product' => $productsell
         ]);
-    } catch (\Exception $e) {
+        } catch (\Exception $e) {
         \Log::error('Update Error: '.$e->getMessage());
         return response()->json([
             'status' => false,
             'message' => 'Something went wrong!',
             'error' => $e->getMessage()
         ], 500);
+       }
     }
-    }
+    // ✅ Get Single Product Details
+    public function show($id)
+    {
+        $product = ProductSell::with('subcategory')->find($id);
 
+        if (!$product) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Product not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Product details fetched successfully',
+            'data' => $product
+        ], 200);
+    }
+    
     //   delete product
     public function destroy($id)
     {
@@ -443,7 +461,35 @@ class ApiController extends Controller
         ], 200);
     }
     
-    public function show($id)
+    // ✅ Search Category by Name
+    public function searchCategoryByName(Request $request)
+    {
+        $search = $request->input('name');
+
+        if (!$search) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Please provide a category name to search'
+            ], 400);
+        }
+
+        $categories = Category::where('name', 'LIKE', "%$search%")->get();
+
+        if ($categories->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No categories found matching your search'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Categories fetched successfully',
+            'data' => $categories
+        ], 200);
+    }
+
+    public function showProductdetails($id)
    {
     // Find product by ID
     $product = ProductSell::find($id);

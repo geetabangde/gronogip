@@ -13,6 +13,7 @@ use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\ProductListingController;
 use App\Http\Controllers\DemandListingController;
+use App\Http\Controllers\RedeemController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -69,13 +70,22 @@ Route::get('/', function () {
         Route::delete('/delete/{id}', [BannerController::class, 'destroy'])->name('admin.banners.destroy');
         });
 
-        // Product Routes
+        // Product Sell Routes
         Route::prefix('products')->group(function () {
             Route::get('/', [ProductController::class, 'index'])->name('admin.products.index');
             Route::post('/store', [ProductController::class, 'store'])->name('admin.products.store');
             Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('admin.products.edit');
             Route::post('/update/{id}', [ProductController::class, 'update'])->name('admin.products.update');
             Route::delete('/delete/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+        });
+
+        // Product Redeem
+        Route::prefix('redeem')->group(function () {
+            Route::get('/', [RedeemController::class, 'index'])->name('admin.redeem.index');
+            Route::post('/store', [RedeemController::class, 'store'])->name('admin.redeem.store');
+            Route::get('/edit/{id}', [RedeemController::class, 'edit'])->name('admin.redeem.edit');
+            Route::post('/update/{id}', [RedeemController::class, 'update'])->name('admin.redeem.update');
+            Route::delete('/delete/{id}', [RedeemController::class, 'destroy'])->name('admin.redeem.destroy');
         });
 });
 

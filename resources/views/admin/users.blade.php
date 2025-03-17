@@ -34,8 +34,8 @@
                                                 
                                                 <th>Name</th>
                                                 <th>Mobile Number</th>
-                                                <th>Email Id</th>
-                                                <th>Address</th>
+                                                <!-- <th>Email Id</th>
+                                                <th>Address</th> -->
                                                 <th>City</th>
                                             </tr>
                                         </thead>
@@ -47,8 +47,8 @@
                                                
                                                 <td>{{ $user->name }}</td>
                                                 <td>{{ $user->mobile_number }}</td>
-                                                <td>{{ $user->email }}</td>
-                                                <td>{{ $user->address }}</td>
+                                                <!-- <td>{{ $user->email }}</td>
+                                                <td>{{ $user->address }}</td> -->
                                                 <td>{{ $user->city }}</td>
                                             </tr>
                                         @endforeach

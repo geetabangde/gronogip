@@ -34,7 +34,7 @@
                                                 <th>Title</th>
                                                 <th>Enquiry From</th>
                                                 <th>Enquiry To</th>
-                                                <th>Subcategory Name</th>
+                                                <th>Requirement Name</th>
                                                 <th>Price</th>
                                                 <th>Quantity</th>
                                                 <th>Location</th>

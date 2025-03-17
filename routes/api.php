@@ -24,13 +24,14 @@ Route::get('/categories', [ApiController::class, 'getCategories']);  // ✅ GET 
 Route::get('/categories/{category_id}/subcategories', [ApiController::class, 'getSubcategoriesByCategory']); // ✅ GET Categories wise SUbCategories API
 Route::get('/products', [ApiController::class, 'getFilteredProducts']); // ✅ GET All subcatogorywise product API
 Route::get('/subcategory/{id}/products', [ApiController::class, 'getProductsBySubcategory']);
-
+Route::get('/categories/{category_id}/products', [ApiController::class, 'searchByCategory']); // ✅ Search Products by Category
 
 // products api for sell
 Route::get('/getproducts', [ApiController::class, 'allProducts']); // Get all products
 Route::post('/allproducts', [ApiController::class, 'store']); // Add a product
 Route::post('/products/{id}', [ApiController::class, 'update']); // Update a product
 Route::delete('/products/{id}', [ApiController::class, 'destroy']); // Delete a product
+Route::get('/categories/search', [ApiController::class, 'searchCategoryByName']); // ✅ Search Category by Name
 
 // products redeem api 
 Route::get('/redeemproducts', [ApiController::class, 'allredeemproducts']); // Get all products
