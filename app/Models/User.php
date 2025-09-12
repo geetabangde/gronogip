@@ -19,14 +19,20 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'otp',
         'name',
-        'email',
+        'you_are',
+        'pan_number',
+        'firm_number',
+        'gst_number',
         'mobile_number',
+        'adhar_number',
         'address',
         'city',
-        'otp',
-        'refer_code',
-        'api_token'
+        'state',
+        'pincode',
+        'industry'
+        
 
     ];
 

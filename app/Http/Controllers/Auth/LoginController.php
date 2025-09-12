@@ -20,40 +20,43 @@ class LoginController extends Controller
     
     public function showLoginForm()
     {
-        return view('admin.login'); // Ensure this view exists
+        return view('admin.login');
     }
-
-    
 
     public function login(Request $request)
-{
-    // Validate request data
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|min:6',
-    ]);
+   {
+        // Validate request data
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
 
-    // Check if admin exists
-    $admin = Admin::where('email', $request->email)->first();
+        // Attempt login
+        // Attempt login using admin guard (covers all roles)
+            if (Auth::guard('admin')->attempt($request->only('email', 'password'))) {
+                $user = Auth::guard('admin')->user();
 
-    if (!$admin) {
-        return back()->withErrors(['email' => 'Admin not found.']); // ✅ Admin exists nahi to error
+                // Role-based redirect
+                switch ($user->role_id) {
+                    case 1:
+                        return redirect()->route('admin.dashboard');
+                    case 2:
+                        return redirect()->route('retailer.dashboard');
+                    case 3:
+                        return redirect()->route('manufacturer.dashboard');
+                    default:
+                        Auth::guard('admin')->logout();
+                        return back()->withErrors(['email' => 'Unauthorized role.']);
+                }
+            }
+
+        // Login failed
+        return back()->withErrors(['email' => 'Invalid credentials.']);
+   }
+    public function logout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        return redirect()->route('admin.login');
     }
-
-    // Attempt login only if admin exists
-    if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
-        return redirect()->route('admin.dashboard');
-    }
-
-    return back()->withErrors(['email' => 'Invalid credentials.']); // ✅ Agar password galat to error
-}
-
-
-        
-        public function logout(Request $request)
-        {
-            Auth::guard('admin')->logout();
-            $request->session()->invalidate();
-            return redirect()->route('admin.login');
-        }
 }

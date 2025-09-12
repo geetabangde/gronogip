@@ -34,8 +34,6 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        
-        
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
@@ -45,10 +43,12 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
-        'auth.admin' => \App\Http\Middleware\AuthenticateAdmin::class, // ✅ Ensure this exists
-        'adminlocalize' => \App\Http\Middleware\AdminLocalize::class, // ✅ Add this line
+        'auth.admin' => \App\Http\Middleware\AuthenticateAdmin::class,
+        'admin.localize' => \App\Http\Middleware\AdminLocalize::class,
+        'checkrole' => \App\Http\Middleware\CheckRole::class,
 
-       ];
-       
+        'setlocale' => \App\Http\Middleware\SetLocale::class, // ✅ correct
+        
+    ];
 
 }

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User; 
+
 use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
 {
     public function index()
-    {
-        return view('admin.dashboard'); // Ensure this view exists
+    {   
+        $userCount = User::count(); // Get total users
+        return view('admin.dashboard', compact('userCount'));
     }
+
 }
