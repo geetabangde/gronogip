@@ -21,19 +21,9 @@ class User extends Authenticatable
     protected $fillable = [
         'otp',
         'name',
-        'you_are',
-        'pan_number',
-        'firm_number',
-        'gst_number',
         'mobile_number',
-        'adhar_number',
-        'address',
-        'city',
-        'state',
-        'pincode',
-        'industry'
-        
-
+        'email',
+        'password',
     ];
 
     /**

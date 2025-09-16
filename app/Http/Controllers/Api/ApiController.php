@@ -25,16 +25,7 @@ class ApiController extends Controller
     {   
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'you_are' => 'required|in:manufacturer,cnf/super stockist',
-            'pan_number' => 'required|string|max:10|unique:users',
-            'firm_number' => 'nullable|string|max:255',
-            'gst_number' => 'nullable|string|max:15',
-            'adhar_number' => 'nullable|string|max:12',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'pincode' => 'nullable|string|max:10',
-            'industry' => 'required|in:food,chemical,insurance',
+            'email'=>'required|string|email|max:255|unique:users',
             'mobile_number' => 'required|string|max:20|unique:users',
         ]);
 
@@ -115,7 +106,7 @@ class ApiController extends Controller
         ]);
     }
 
-// ✅ Login with Mobile (Naya Token Generate Hoga)
+    // ✅ Login with Mobile (Naya Token Generate Hoga)
     public function loginWithMobile(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -173,8 +164,7 @@ class ApiController extends Controller
    
        // 📝 Fields that can be updated
        $updatableFields = [
-           'address', 'city', 'state', 'pincode', 'gst_no',
-           'aadhar_no', 'firm_name', 'industry_sector', 'you_are'
+           'name', 'email', 'mobile_number', 
        ];
    
        foreach ($updatableFields as $field) {
@@ -192,8 +182,6 @@ class ApiController extends Controller
        ], 200);
    }
    
-
-   
     public function logout(Request $request){
         $user = User::where('id',$request->user()->id)->first();
         if($user){
@@ -208,11 +196,6 @@ class ApiController extends Controller
         }
     }
 }
-   
-
-
-
-
 
 
 
