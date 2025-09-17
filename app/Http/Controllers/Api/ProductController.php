@@ -43,8 +43,8 @@ class ProductController extends Controller
 
         $imageName = null;
 
+        
         // Image upload logic
-         // Image upload logic
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $file = $request->file('image');
             $imageName = 'image_' . time() . '.' . $file->getClientOriginalExtension();

@@ -20,7 +20,7 @@
                     </a>
                 </li>
 
-                {{-- Sirf Admin ke liye --}}
+                    <!-- only admin login -->
                 @if($user->role_id == 1)
                     <li>
                         <a href="#">
@@ -30,7 +30,7 @@
                     </li>
                 @endif
 
-                {{-- Sirf Retailer ke liye --}}
+                <!-- only for retailer -->
                 @if($user->role_id == 2)
                     <li>
                         <a href="#">
@@ -39,8 +39,7 @@
                         </a>
                     </li>
                 @endif
-
-                {{-- Sirf Manufacturer ke liye --}}
+                <!-- only for manufacturer -->
                 @if($user->role_id == 3)
                     <li>
                         <a href="#">
@@ -48,11 +47,24 @@
                             <span data-key="t-history">History</span>
                         </a>
                     </li>
+                
+                    <!-- brand -->
+                     <li>
+                        <a href="{{ route('admin.brand.index') }}">
+                            <i data-feather="layers"></i>
+                            <span data-key="t-brand">Brand</span>
+                        </a>
+                    </li>
+                    <!-- product -->
+                     <li>
+                        <a href="{{ route('admin.product.index') }}">
+                            <i data-feather="shopping-bag"></i>
+                            <span data-key="t-product">Product</span>
+                        </a>
+                    </li>
                 @endif
             </ul>
-
             <!-- Sidebar -->
-
         </div>
     </div>
 </div>
