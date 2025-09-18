@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->tinyInteger('status')->default(1); // 1=active, 0=inactive
+            $table->unsignedBigInteger('manufacturer_id')->after('id'); 
+            $table->foreign('manufacturer_id')->references('id')->on('admins')->onDelete('cascade'); 
             $table->timestamps();
         });
     }

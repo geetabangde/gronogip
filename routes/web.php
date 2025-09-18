@@ -18,11 +18,12 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])->name('admin.login.submit');
     Route::get('/logout', [LoginController::class, 'logout'])->name('admin.logout');
 });
-
-
-
 Route::middleware(['auth:admin', CheckRole::class . ':1'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/manufacturers/create', [AdminDashboardController::class,'createManufacturer'])->name('admin.manufacturers.create'); 
+    Route::post('/admin/manufacturers/create', [AdminDashboardController::class,'storeManufacturer'])->name('admin.manufacturers.store');
+    Route::get('/admin/manufacturers', [AdminDashboardController::class, 'listManufacturers'])->name('admin.manufacturers.list');
+    Route::delete('/admin/manufacturer/{id}', [AdminDashboardController::class,'deleteManufacturer'])->name('admin.manufacturer.delete'); 
 });
 
 Route::middleware(['auth:admin', CheckRole::class . ':2'])->group(function () {
@@ -32,19 +33,18 @@ Route::middleware(['auth:admin', CheckRole::class . ':2'])->group(function () {
 Route::middleware(['auth:admin', CheckRole::class . ':3'])->group(function () {
     Route::get('/manufacturer/dashboard', [ManufacturerDashboardController::class, 'index'])->name('manufacturer.dashboard');
     // brand routes
-    Route::get('/manufacturer/brands', [BrandController::class, 'index'])->name('admin.brand.index'); // list brands
-    Route::get('/manufacturer/brands/create', [BrandController::class,'create'])->name('admin.brand.create'); // add brand form
-    Route::post('/manufacturer/brands', [BrandController::class,'store'])->name('admin.brand.store'); // save brand
-    Route::get('/manufacturer/brands/{id}/edit', [BrandController::class,'edit'])->name('admin.brand.edit'); // edit brand form
-    Route::put('/manufacturer/brands/{id}', [BrandController::class,'update'])->name('admin.brand.update'); // update brand
-    Route::delete('/manufacturer/brands/{id}', [BrandController::class,'destroy'])->name('admin.brand.delete'); // delete brand
+    Route::get('/manufacturer/brands', [BrandController::class, 'index'])->name('admin.brand.index'); 
+    Route::get('/manufacturer/brands/create', [BrandController::class,'create'])->name('admin.brand.create'); 
+    Route::post('/manufacturer/brands', [BrandController::class,'store'])->name('admin.brand.store'); 
+    Route::get('/manufacturer/brands/{id}/edit', [BrandController::class,'edit'])->name('admin.brand.edit'); 
+    Route::put('/manufacturer/brands/{id}', [BrandController::class,'update'])->name('admin.brand.update'); 
+    Route::delete('/manufacturer/brands/{id}', [BrandController::class,'destroy'])->name('admin.brand.delete'); 
     // product routes
-    
-    Route::get('/manufacturer/products', [ProductController::class, 'index'])->name('admin.product.index'); // list products
-    Route::get('/manufacturer/products/create', [ProductController::class,'create'])->name('admin.product.create'); // add product form
-    Route::post('/manufacturer/products', [ProductController::class,'store'])->name('admin.product.store'); // save product
-    Route::get('/manufacturer/products/{id}/edit', [ProductController::class,'edit'])->name('admin.product.edit'); // edit product form
-    Route::put('/manufacturer/products/{id}', [ProductController::class,'update'])->name('admin.product.update'); // update product
-    Route::delete('/manufacturer/products/{id}', [ProductController::class,'destroy'])->name('admin.product.delete'); // delete product
+    Route::get('/manufacturer/products', [ProductController::class, 'index'])->name('admin.product.index'); 
+    Route::get('/manufacturer/products/create', [ProductController::class,'create'])->name('admin.product.create'); 
+    Route::post('/manufacturer/products', [ProductController::class,'store'])->name('admin.product.store'); 
+    Route::get('/manufacturer/products/{id}/edit', [ProductController::class,'edit'])->name('admin.product.edit'); 
+    Route::put('/manufacturer/products/{id}', [ProductController::class,'update'])->name('admin.product.update'); 
+    Route::delete('/manufacturer/products/{id}', [ProductController::class,'destroy'])->name('admin.product.delete'); 
 });
  

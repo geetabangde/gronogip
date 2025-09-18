@@ -30,11 +30,23 @@ class LoginController extends Controller
             'email'    => 'required|email',
             'password' => 'required',
         ]);
+          // Find user by email first
+         $user = Admin::where('email', $request->email)->first();
 
-        // Attempt login
+        //     if($user) {
+        //     dd([
+        //         'user' => $user,
+        //         'password_input' => $request->password,
+        //         'check_password' => Hash::check($request->password, $user->password),
+        //     ]);
+        // } else {
+        //     dd('No user found with this email');
+        // }
+
         // Attempt login using admin guard (covers all roles)
             if (Auth::guard('admin')->attempt($request->only('email', 'password'))) {
                 $user = Auth::guard('admin')->user();
+                // Hashing password for security reasons
 
                 // Role-based redirect
                 switch ($user->role_id) {

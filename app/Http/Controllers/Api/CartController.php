@@ -112,4 +112,13 @@ class CartController extends Controller
             'data' => $cartItems
         ], 200);
     }
+
+    public function checkout(Request $request){
+        // Check if cart is empty
+        $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
+        if($cartItems->isEmpty()) return response()->json(['message'=>'Cart is empty'],400);
+        // Perform checkout operation
+        //...
+        return response()->json(['message'=>'Checkout successful'],200);
+    }
 }

@@ -48,7 +48,7 @@ return [
             'hash' => true,
         ],
 
-        'admin' => [ // ✅ Admin guard define kiya
+        'admin' => [ 
         'driver' => 'session',
         'provider' => 'admins',
         ],

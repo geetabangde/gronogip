@@ -11,5 +11,11 @@ class Brand extends Model
     //
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'status'];
+    protected $fillable = ['name', 'image','description', 'status','manufacturer_id'];
+
+    public function manufacturer()
+   {
+      return $this->belongsTo(Admin::class, 'manufacturer_id');
+   }
+
 }

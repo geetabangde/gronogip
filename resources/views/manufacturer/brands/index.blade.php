@@ -35,6 +35,7 @@
                      <tr>
                         <th>#</th>
                         <th>Brand Name</th>
+                        <th>Image</th>
                         <th>Description</th>
                         <th>Actions</th>
                      </tr>
@@ -44,6 +45,13 @@
                      <tr>
                          <td>{{ $loop->iteration }}</td>
                         <td>{{ $brand->name }}</td>
+                        <td>
+                           @if($brand->image)
+                              <img src="{{ $brand->image }}" alt="{{ $brand->name }}" width="50" height="50">
+                           @else
+                              N/A
+                           @endif
+                        </td>
                         <td>{{ $brand->description }}</td>
                         <td>
                            

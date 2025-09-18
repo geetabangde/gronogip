@@ -16,7 +16,7 @@
                   </a>
                </div>
 
-               <form action="{{ route('admin.brand.update', $brand->id) }}" method="POST">
+               <form action="{{ route('admin.brand.update', $brand->id) }}" method="POST" enctype="multipart/form-data">
                   @csrf
                   @method('PUT')
                   <div class="card-body">
@@ -28,6 +28,16 @@
                                     value="{{ old('name', $brand->name) }}" required>
                            </div>
                         </div>
+                        <!-- Image Upload -->
+                        <div class="col-md-4">
+                           <div class="mb-3">
+                              <label class="form-label">Brand Image</label>
+                              <input type="file" name="image" class="form-control">
+                              @if($brand->image)
+                                 <img src="{{ $brand->image }}" alt="brand Image" style="width: 80px; margin-top: 5px;">
+                              @endif
+                           </div>
+                        </div>
 
                         <div class="col-md-6">
                            <div class="mb-3">
@@ -35,6 +45,7 @@
                               <textarea name="description" class="form-control">{{ old('description', $brand->description) }}</textarea>
                            </div>
                         </div>
+                        
                      </div>
 
                      <div class="text-end">

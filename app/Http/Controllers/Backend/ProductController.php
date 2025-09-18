@@ -22,6 +22,7 @@ class ProductController extends Controller
         return view('manufacturer.products.index', compact('products'));
     }
    
+
     public function create(){
         $brands = Brand::all();
         return view('manufacturer.products.create',compact('brands'));

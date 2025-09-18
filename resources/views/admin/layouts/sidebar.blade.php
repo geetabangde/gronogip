@@ -23,7 +23,7 @@
                     <!-- only admin login -->
                 @if($user->role_id == 1)
                     <li>
-                        <a href="#">
+                        <a href="{{ route('admin.manufacturers.list') }}">
                             <i data-feather="package"></i>
                             <span data-key="t-manufacturers">Manufacturer</span>
                         </a>

@@ -20,7 +20,7 @@
                            ⬅ Back
                            </a>
                         </div>
-                        <form action="{{ route('admin.brand.store') }}" method="POST">
+                        <form action="{{ route('admin.brand.store') }}" method="POST" enctype="multipart/form-data">
                            @csrf
                            <div class="card-body">
                                 <div class="row">
@@ -30,6 +30,13 @@
                                        <input type="text" name="name" class="form-control" placeholder="Enter a Brand name" required>
                                     </div>
                                  </div>
+                                 <!-- Image -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Brand Image</label>
+                                        <input type="file" name="image" class="form-control">
+                                    </div>
+                                </div>
                                  <!-- description -->
                                  <div class="col-md-4">
                                     <div class="mb-3">
@@ -37,6 +44,7 @@
                                        <textarea name="description" class="form-control" placeholder="Enter a brief description"></textarea>
                                     </div>
                                  </div>
+                                 
 
                                 </div>
                               <div class="text-end">
