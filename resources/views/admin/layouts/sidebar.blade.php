@@ -12,14 +12,19 @@
             <ul class="metismenu list-unstyled" id="side-menu">
                 <li class="menu-title bg-center" data-key="t-menu">Menu</li>
 
-                {{-- Dashboard sabko dikhana hai --}}
+            
                 <li>
                     <a href="{{ route('admin.dashboard') }}">
                         <i data-feather="home"></i>
                         <span data-key="t-dashboard">Dashboard</span>
                     </a>
                 </li>
-
+                <li>
+                    <a href="{{ route('admin.order.list') }}">
+                        <i data-feather="shopping-bag"></i>
+                        <span data-key="t-order">Order</span>
+                    </a>
+                </li>
                     <!-- only admin login -->
                 @if($user->role_id == 1)
                     <li>
@@ -28,6 +33,20 @@
                             <span data-key="t-manufacturers">Manufacturer</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('admin.brand.list') }}">
+                            <i data-feather="layers"></i>
+                            <span data-key="t-brand">Brand</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.product.list') }}">
+                            <i data-feather="layers"></i>
+                            <span data-key="t-brand">Products</span>
+                        </a>
+                    </li>
+                     
+
                 @endif
 
                 <!-- only for retailer -->
@@ -60,6 +79,13 @@
                         <a href="{{ route('admin.product.index') }}">
                             <i data-feather="shopping-bag"></i>
                             <span data-key="t-product">Product</span>
+                        </a>
+                    </li>
+                    <!-- order -->
+                     <li>
+                        <a href="{{ route('admin.order.list') }}">
+                            <i data-feather="shopping-bag"></i>
+                            <span data-key="t-order">Order</span>
                         </a>
                     </li>
                 @endif

@@ -11,7 +11,9 @@ class ProductController extends Controller
     // List all products for the authenticated user
     public function index()
    {
-    $products = Product::where('user_id', Auth::id())->get();
+    $products = Product::with('manufacturer')
+                   ->orderBy('id','desc')
+                   ->get();
 
     // add full image path
     $products = $products->map(function ($product) {
@@ -39,6 +41,7 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'brand_id' => 'required|integer|exists:brands,id',
+            'manufacturer_id' => 'required|exists:admins,id',
         ]);
 
         $imageName = null;
@@ -61,6 +64,7 @@ class ProductController extends Controller
             'price' => $request->price,
             'description' => $request->description,
             'brand_id' => $request->brand_id,
+            'manufacturer_id' => $request->manufacturer_id,
             'user_id' => Auth::id(),
             'status' => $request->status ?? 'active', // default if status not sent
         ]);
@@ -99,7 +103,7 @@ class ProductController extends Controller
             'price' => 'sometimes|required|numeric',
             'description' => 'nullable|string',
             'brand_id' => 'sometimes|required|integer|exists:brands,id',
-            
+            'manufacturer_id'=>'required|exists:admins,id',
         ]);
 
         // Handle image upload

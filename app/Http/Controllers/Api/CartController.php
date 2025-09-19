@@ -14,7 +14,7 @@ class CartController extends Controller
    {
     $request->validate([
         'product_id' => 'required|exists:products,id',
-        'quantity' => 'nullable|integer|min:1'
+        'quantity'   => 'nullable|integer|min:1'
     ]);
 
     $product = Product::findOrFail($request->product_id);
@@ -29,14 +29,23 @@ class CartController extends Controller
         ], 400);
     }
 
+    // Check manufacturer consistency
+    $existingCart = Cart::where('user_id', Auth::id())->first();
+    if ($existingCart && $existingCart->manufacturer_id !== $product->manufacturer_id) {
+        return response()->json([
+            'message' => 'You can only add products from one manufacturer at a time.',
+        ], 400);
+    }
+
     // Update or create cart
     $cart = Cart::updateOrCreate(
         [
-            'user_id' => Auth::id(),
-            'product_id' => $product->id,
+            'user_id'        => Auth::id(),
+            'product_id'     => $product->id,
         ],
         [
-            'quantity' => $requestedQty,
+            'quantity'       => $requestedQty,
+            'manufacturer_id'=> $product->manufacturer_id, // ✅ manufacturer set
         ]
     );
 
@@ -45,13 +54,16 @@ class CartController extends Controller
 
     return response()->json([
         'message' => 'Product added to cart successfully',
-        'data' => $cart->load('product')
+        'data'    => $cart->load('product')
     ], 201);
-   }
+}
+
+
     public function updateCart(Request $request, $id)
-    {
+   {
         $request->validate([
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+            'manufacturer_id' => 'required|exists:admins,id' 
         ]);
 
         $cart = Cart::where('user_id', Auth::id())->findOrFail($id);
@@ -70,42 +82,48 @@ class CartController extends Controller
                     'message' => 'Only ' . $product->quantity . ' units available in stock',
                 ], 400);
             }
-
             // Stock se minus karo
             $product->decrement('quantity', $difference);
         } elseif ($difference < 0) {
-            // Agar nayi qty kam hai, to stock wapas add karo
+            
             $product->increment('quantity', abs($difference));
         }
 
-        // Update cart
+        // Update cart with manufacturer
         $cart->update([
             'quantity' => $newQty,
+            'manufacturer_id' => $request->manufacturer_id,
         ]);
 
         return response()->json([
             'message' => 'Cart updated successfully',
-            'data' => $cart->load('product')
+            'data' => $cart->load(['product','manufacturer'])
         ]);
-   }
+    }
 
 
     // Remove from Cart
     public function removeFromCart($id)
     {
-    
         $cart = Cart::where('user_id', Auth::id())
             ->where('id', $id)
             ->firstOrFail();
+
         $cart->delete();
 
-        return response()->json(['message' => 'Product removed from cart successfully'], 200);
+        return response()->json([
+            'message' => 'Product removed from cart successfully',
+            'data' => $cart->load(['product','manufacturer'])
+        ], 200);
     }
+
 
     // Cart List
     public function cartList()
     {
-        $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
+        $cartItems = Cart::where('user_id', Auth::id())
+            ->with(['product','manufacturer'])
+            ->get();
 
         return response()->json([
             'message' => 'Cart items fetched successfully',
@@ -113,12 +131,5 @@ class CartController extends Controller
         ], 200);
     }
 
-    public function checkout(Request $request){
-        // Check if cart is empty
-        $cartItems = Cart::where('user_id', Auth::id())->with('product')->get();
-        if($cartItems->isEmpty()) return response()->json(['message'=>'Cart is empty'],400);
-        // Perform checkout operation
-        //...
-        return response()->json(['message'=>'Checkout successful'],200);
-    }
+    
 }

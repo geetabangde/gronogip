@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User; 
 use App\Models\Admin;
+use App\Models\Brand;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,10 +16,53 @@ class AdminDashboardController extends Controller
         $userCount = User::count(); // Get total users
         return view('admin.dashboard', compact('userCount'));
     }
+    // listBrands
+    public function listBrands()
+   {
+    $brands = Brand::with('manufacturer')->get();
+    return view('admin.brands.list', compact('brands'));
+   }
+//    admin.product.list
+
+    public function listProducts()
+    {
+        $products = Product::all();
+        $products = $products->map(function ($product) {
+            if ($product->image) {
+                $product->image = url('uploads/' . basename($product->image));
+            }
+            return $product;
+        });
+        return view('admin.products.list', compact('products'));
+    }
+
+
     // Show create manufacturer form
     public function createManufacturer()
     {
         return view('admin.manufacturers.create'); 
+    }
+    // edit manufacturer form
+    public function editManufacturer($id){
+        $manufacturer = Admin::find($id);
+        if (!$manufacturer) {
+            return redirect()->route('admin.manufacturers.list')->with('error', 'Manufacturer not found');
+        }
+        return view('admin.manufacturers.edit', compact('manufacturer'));
+    }
+    // Update a manufacturer
+    public function updateManufacturer(Request $request, $id)
+    {
+        
+        $manufacturer = Admin::find($id);   
+        
+        // Update manufacturer
+        $manufacturer->name = $request->name;
+        $manufacturer->email = $request->email;
+        $manufacturer->address = $request->address;
+        
+        $manufacturer->save();
+        return redirect()->route('admin.manufacturers.list')->with('success', 'Manufacturer updated successfully.');
     }
 
     // Store manufacturer
@@ -51,6 +96,7 @@ class AdminDashboardController extends Controller
         $manufacturers = Admin::where('role_id', 3)->get(); // role_id = 3 for manufacturers
         return view('admin.manufacturers.list', compact('manufacturers'));
     }
+
     // delete manufacturer
 
     public function deleteManufacturer($id){

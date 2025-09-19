@@ -63,8 +63,8 @@ class BrandController extends Controller
     public function show($id){
         $brand = Brand::find($id);
         // add full image path
-        if ($product->image) {
-            $product->image = url('uploads/' . basename($product->image));
+        if ($brand->image) {
+            $brand->image = url('uploads/' . basename($brand->image));
         }
         if(!$brand) return response()->json(['message'=>'Brand not found'],404);
         return response()->json(['brand'=>$brand],200);
@@ -88,11 +88,11 @@ class BrandController extends Controller
             $file->move(public_path('uploads'), $imageName);
 
             // full URL
-            $product->image = url('uploads/' . $imageName);
+            $brand->image = url('uploads/' . $imageName);
         }
 
         // Update other fields
-        $product->fill($request->except('image'));
+        $brand->fill($request->except('image'));
 
         $brand->update($request->only('name','description','status','manufacturer_id'));
         return response()->json(['message'=>'Brand updated successfully','brand'=>$brand],200);
@@ -101,8 +101,8 @@ class BrandController extends Controller
     public function destroy($id){
         $brand = Brand::find($id);
         // Delete image if exists
-        if ($product->image) {
-            $imagePath = public_path('uploads/' . basename($product->image));
+        if ($brand->image) {
+            $imagePath = public_path('uploads/' . basename($brand->image));
             if (file_exists($imagePath)) {
                 unlink($imagePath);
             }

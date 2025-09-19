@@ -15,7 +15,9 @@ class Brand extends Model
 
     public function manufacturer()
    {
-      return $this->belongsTo(Admin::class, 'manufacturer_id');
+      return $this->belongsTo(Admin::class, 'manufacturer_id', 'id');
    }
+   
+
 
 }

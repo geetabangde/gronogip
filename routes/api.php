@@ -45,9 +45,8 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::get('cart/list', [CartController::class, 'cartList']);
     Route::put('/cart/update/{id}', [CartController::class, 'updateCart']);
     
-
-   // Order routes
-     Route::post('cart/checkout', [OrderController::class, 'checkout']);
+    // Order routes
+    Route::post('cart/checkout', [OrderController::class, 'checkout']);
     Route::get('orders', [OrderController::class, 'orderList']);
     Route::get('orders/{id}', [OrderController::class, 'show']);
 

@@ -10,17 +10,22 @@ class ProductController extends Controller
 {
     // List all products for the authenticated user
     public function index()
-    {
-        
-        $products = Product::all();
+   {
+        $products = Product::with('manufacturer')
+            ->where('manufacturer_id', auth()->id()) 
+            ->orderBy('id', 'desc')
+            ->get();
+
         $products = $products->map(function ($product) {
             if ($product->image) {
                 $product->image = url('uploads/' . basename($product->image));
             }
             return $product;
         });
+
         return view('manufacturer.products.index', compact('products'));
-    }
+  }
+
    
 
     public function create(){
@@ -38,6 +43,7 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'brand_id' => 'required|integer|exists:brands,id',
+            
         ]);
         // Image upload logic
         $imageUrl = null;
@@ -59,8 +65,10 @@ class ProductController extends Controller
             'price' => $request->price,
             'description' => $request->description,
             'brand_id' => $request->brand_id,
-            'status' => $request->status ?? 1, // default 1 = active
+            'manufacturer_id' => auth()->id(),
+            'status' => $request->status ?? 1, 
         ]);
+        // dd($product);
 
         return redirect()->route('admin.product.index')->with('success', 'Product created successfully.');
     }
@@ -68,7 +76,9 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $product = Product::find($id);
+        $product = Product::where('id', $id)
+            ->where('manufacturer_id', auth()->id()) // security: only own brand
+            ->first();
         $brands = Brand::all();
         if (!$product) {
             return redirect()->route('admin.product.index')->with('error', 'Product not found');
@@ -80,7 +90,9 @@ class ProductController extends Controller
     public function update(Request $request, $id)
    {
     // Fetch the product by ID (no user_id check)
-    $product = Product::findOrFail($id);
+    $product = Product::where('id', $id)
+                ->where('manufacturer_id', auth()->id())
+                ->first();
 
     // Validation
     $request->validate([

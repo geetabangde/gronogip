@@ -13,7 +13,7 @@ class BrandController extends Controller
     public function index()
     {
         $brands = Brand::with('manufacturer')
-            ->where('manufacturer_id', auth()->id()) // only logged in manufacturer
+            ->where('manufacturer_id', auth()->id()) 
             ->get()
             ->map(function ($brand) {
                 if ($brand->image) {
@@ -23,6 +23,7 @@ class BrandController extends Controller
             });
 
         return view('manufacturer.brands.index', compact('brands'));
+
     }
 
         // ✅ Show Create Form
