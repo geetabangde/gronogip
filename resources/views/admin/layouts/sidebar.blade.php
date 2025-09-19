@@ -19,12 +19,7 @@
                         <span data-key="t-dashboard">Dashboard</span>
                     </a>
                 </li>
-                <li>
-                    <a href="{{ route('admin.order.list') }}">
-                        <i data-feather="shopping-bag"></i>
-                        <span data-key="t-order">Order</span>
-                    </a>
-                </li>
+                
                     <!-- only admin login -->
                 @if($user->role_id == 1)
                     <li>

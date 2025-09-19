@@ -43,32 +43,31 @@
                             </thead>
                             <tbody>
                                 @forelse($orders as $order)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>#{{ $order->id }}</td>
-                                        <td>{{ $order->user_name }}</td>
-                                        <td>{{ $order->created_at->format('d M Y, h:i A') }}</td>
-                                        <td>
-                                            <span class="badge 
-                                                {{ $order->status == 'pending' ? 'bg-warning' : 'bg-success' }}">
-                                                {{ ucfirst($order->status) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="badge 
-                                                {{ $order->payment_status == 'unpaid' ? 'bg-danger' : 'bg-success' }}">
-                                                {{ ucfirst($order->payment_status) }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $order->payment_method }}</td>
-                                        <td>₹{{ number_format($order->total_amount, 2) }}</td>
-                                        <td>{{ $order->address }}</td>
-                                    </tr>
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>#{{ $order->id }}</td>
+                                    <td>{{ $order->user->name ?? 'N/A' }}</td>
+                                    <td>{{ $order->created_at->format('d M Y, h:i A') }}</td>
+                                    <td>
+                                        <span class="badge {{ $order->status == 'pending' ? 'bg-warning' : 'bg-success' }}">
+                                            {{ ucfirst($order->status) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $order->payment_status == 'unpaid' ? 'bg-danger' : 'bg-success' }}">
+                                            {{ ucfirst($order->payment_status) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $order->payment_method }}</td>
+                                    <td>₹{{ number_format($order->total_amount, 2) }}</td>
+                                    <td>{{ $order->address }}</td>
+                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="8" class="text-center">No orders found.</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="9" class="text-center">No orders found.</td>
+                                </tr>
                                 @endforelse
+
                             </tbody>
                         </table>
                     </div>

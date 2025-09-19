@@ -20,5 +20,6 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
     
+    
 
 }

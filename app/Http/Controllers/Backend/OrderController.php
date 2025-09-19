@@ -13,14 +13,21 @@ class OrderController extends Controller
 {
     
     public function listOrders()
-   {
-        // Fetch orders for the authenticated user with related product details
-        $orders = Order::where('user_id', Auth::id())
-            ->with('items.product')   
-            ->latest()
-            ->get();
-        return view('manufacturer.orders.list', compact('orders'));
-   }
+{
+    $manufacturerId = Auth::id(); // Manufacturer ID
+
+    $orders = Order::whereHas('items', function($query) use ($manufacturerId) {
+        $query->where('manufacturer_id', $manufacturerId);
+    })
+    ->with(['items' => function($query) use ($manufacturerId) {
+        $query->where('manufacturer_id', $manufacturerId)->with('product');
+    }, 'user']) // Eager load user for retailer name
+    ->latest()
+    ->get();
+
+    return view('manufacturer.orders.list', compact('orders'));
+}
+
     // Show single order
     public function show($id)
     {
