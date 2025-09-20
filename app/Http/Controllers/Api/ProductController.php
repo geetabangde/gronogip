@@ -9,13 +9,20 @@ use Illuminate\Support\Facades\Auth;
 class ProductController extends Controller
 {
     // List all products for the authenticated user
-    public function index()
-   {
-    $products = Product::with('manufacturer')
-                   ->orderBy('id','desc')
-                   ->get();
+    public function index(Request $request)
+{
+    // Start with query builder
+    $query = Product::with('manufacturer')->orderBy('id','desc');
 
-    // add full image path
+    // Filter by manufacturer_id if provided
+    if ($request->has('manufacturer_id')) {
+        $query->where('manufacturer_id', $request->manufacturer_id);
+    }
+
+    // Execute query
+    $products = $query->get();
+
+    // Add full image path
     $products = $products->map(function ($product) {
         if ($product->image) {
             $product->image = url('uploads/' . basename($product->image));
@@ -24,11 +31,10 @@ class ProductController extends Controller
     });
 
     return response()->json([
-        'message' => 'Product List',
-        'data' => $products
+        'products' => $products
     ], 200);
+}
 
-   }
 
 
     // Store a new product
@@ -46,7 +52,6 @@ class ProductController extends Controller
 
         $imageName = null;
 
-        
         // Image upload logic
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $file = $request->file('image');
@@ -88,8 +93,7 @@ class ProductController extends Controller
             'message' => 'Product Details',
             'data' => $product
         ], 200);
-   }
-
+    }
 
     // Update a product
     public function update(Request $request, $id)

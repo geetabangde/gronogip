@@ -8,56 +8,62 @@ use App\Models\Brand;
 
 class BrandController extends Controller
 {
-    public function index() {
-       $brands = Brand::with('manufacturer')
-                   ->orderBy('id','desc')
-                   ->get();
-                   // add full image path
+    public function index(Request $request) {
+        $query = Brand::with('manufacturer')->orderBy('id', 'desc');
+
+        // Check if manufacturer_id is passed as query param
+        if ($request->has('manufacturer_id')) {
+            $query->where('manufacturer_id', $request->manufacturer_id);
+        }
+
+        $brands = $query->get();
+
+        // Add full image path
         $brands = $brands->map(function ($brand) {
             if ($brand->image) {
                 $brand->image = url('uploads/' . basename($brand->image));
             }
             return $brand;
         });
-       return response()->json(['brands'=>$brands],200);
-    }
 
+        return response()->json(['brands' => $brands], 200);
+    }
 
     public function store(Request $request){
-    $request->validate([
-        'name'            => 'required|string|max:255',
-        'description'     => 'nullable|string',
-        'status'          => 'nullable|in:0,1',
-        'image'           => 'nullable|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-        'manufacturer_id' => 'required|exists:admins,id', // validate manufacturer exists
-    ]);
+        $request->validate([
+            'name'            => 'required|string|max:255',
+            'description'     => 'nullable|string',
+            'status'          => 'nullable|in:0,1',
+            'image'           => 'nullable|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+            'manufacturer_id' => 'required|exists:admins,id', // validate manufacturer exists
+        ]);
 
-    $imageUrl = null;
+        $imageUrl = null;
 
-    // ✅ Image upload logic
-    if ($request->hasFile('image') && $request->file('image')->isValid()) {
-        $file = $request->file('image');
-        $imageName = 'brand_' . time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('uploads'), $imageName);
+        // ✅ Image upload logic
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $file = $request->file('image');
+            $imageName = 'brand_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads'), $imageName);
 
-        // full URL path
-        $imageUrl = url('uploads/' . $imageName);
+            // full URL path
+            $imageUrl = url('uploads/' . $imageName);
+        }
+
+        // ✅ Brand create
+        $brand = Brand::create([
+            'name'            => $request->name,
+            'description'     => $request->description,
+            'status'          => $request->status,
+            'manufacturer_id' => $request->manufacturer_id,
+            'image'           => $imageUrl, // column "image" me URL save hoga
+        ]);
+
+        return response()->json([
+            'message' => 'Brand created successfully',
+            'brand'   => $brand
+        ], 201);
     }
-
-    // ✅ Brand create
-    $brand = Brand::create([
-        'name'            => $request->name,
-        'description'     => $request->description,
-        'status'          => $request->status,
-        'manufacturer_id' => $request->manufacturer_id,
-        'image'           => $imageUrl, // column "image" me URL save hoga
-    ]);
-
-    return response()->json([
-        'message' => 'Brand created successfully',
-        'brand'   => $brand
-    ], 201);
-}
 
 
     public function show($id){
