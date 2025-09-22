@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\ManufacturerController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\QRCodeController;
 
 Route::get('/test-api', function () {
     return response()->json(['message' => 'API is working!'], 200);
@@ -17,11 +18,13 @@ Route::post('register', [ApiController::class, 'register']);
 Route::post('verify-otp', [ApiController::class, 'verifyOtp']); 
 Route::post('login', [ApiController::class, 'loginWithMobile']); 
 
+
 Route::middleware(['auth:sanctum'])->group(function (){
     Route::post('logout', [ApiController::class, 'logout']);
     Route::get('profile', [ApiController::class, 'profile']);
     Route::post('update-profile', [ApiController::class, 'updateProfile']);
-
+    Route::post('create-qr', [QRCodeController::class, 'create']);
+    Route::get('fetch-qr', [QRCodeController::class, 'fetchAll']);
     // Manufacturers list  
     Route::get('manufacturers', [ManufacturerController::class, 'manufacturersList']); 
 
