@@ -40,8 +40,12 @@
                             <span data-key="t-brand">Products</span>
                         </a>
                     </li>
-                     
-
+                    <li>
+                        <a href="{{ route('admin.order.list') }}">
+                            <i data-feather="shopping-bag"></i>
+                            <span data-key="t-order">Order</span>
+                        </a>
+                    </li>
                 @endif
 
                 <!-- only for retailer -->
@@ -78,7 +82,7 @@
                     </li>
                     <!-- order -->
                      <li>
-                        <a href="{{ route('admin.order.list') }}">
+                        <a href="{{ route('manufacturer.orders.list') }}">
                             <i data-feather="shopping-bag"></i>
                             <span data-key="t-order">Order</span>
                         </a>

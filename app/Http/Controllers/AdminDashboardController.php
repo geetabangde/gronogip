@@ -6,8 +6,12 @@ use App\Models\User;
 use App\Models\Admin;
 use App\Models\Brand;
 use App\Models\Product;
+use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AdminDashboardController extends Controller
 {
@@ -22,6 +26,43 @@ class AdminDashboardController extends Controller
     $brands = Brand::with('manufacturer')->get();
     return view('admin.brands.list', compact('brands'));
    }
+   //    order list
+    public function listOrders()
+   {
+        $authUser = Auth::user();
+
+        if ($authUser->role_id == 1) {  
+            // ✅ Admin => sabhi orders dikhayega
+            $orders = Order::with([
+                'items.product',
+                'items.manufacturer',
+                'user'
+            ])->latest()->get();
+
+            return view('admin.orders.list', compact('orders'));
+        }
+
+        if ($authUser->role_id == 3) {  
+            // ✅ Manufacturer => sirf apne orders
+            $manufacturerId = $authUser->id;
+
+            $orders = Order::whereHas('items', function($query) use ($manufacturerId) {
+                    $query->where('manufacturer_id', $manufacturerId);
+                })
+                ->with(['items' => function($query) use ($manufacturerId) {
+                    $query->where('manufacturer_id', $manufacturerId)->with('product');
+                }, 'user'])
+                ->latest()
+                ->get();
+
+            return view('manufacturer.orders.list', compact('orders'));
+        }
+
+        abort(403, 'Unauthorized'); // Agar retailer ya koi aur role ho
+    }
+
+
+
 //    admin.product.list
 
     public function listProducts()

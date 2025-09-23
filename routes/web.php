@@ -19,10 +19,11 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [LoginController::class, 'login'])->name('admin.login.submit');
     Route::get('/logout', [LoginController::class, 'logout'])->name('admin.logout');
 });
-Route::middleware(['auth:admin', CheckRole::class . ':1'])->group(function () {
+Route::middleware(['auth:admin', CheckRole::class . ':1,'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/brands', [AdminDashboardController::class, 'listBrands'])->name('admin.brand.list');
     Route::get('/admin/products', [AdminDashboardController::class, 'listProducts'])->name('admin.product.list');
+    Route::get('/admin/orders', [AdminDashboardController::class, 'listOrders'])->name('admin.order.list');
     Route::get('/admin/manufacturers', [AdminDashboardController::class, 'listManufacturers'])->name('admin.manufacturers.list');
     Route::delete('/admin/manufacturer/{id}', [AdminDashboardController::class,'deleteManufacturer'])->name('admin.manufacturer.delete');
     Route::get('/admin/manufacturers/create', [AdminDashboardController::class,'createManufacturer'])->name('admin.manufacturers.create'); 
@@ -53,7 +54,7 @@ Route::middleware(['auth:admin', CheckRole::class . ':3'])->group(function () {
     Route::put('/manufacturer/products/{id}', [ProductController::class,'update'])->name('admin.product.update'); 
     Route::delete('/manufacturer/products/{id}', [ProductController::class,'destroy'])->name('admin.product.delete');
     // order list routes
-    Route::get('/manufacturer/orders', [OrderController::class, 'listOrders'])->name('admin.order.list');
+    Route::get('/manufacturer/orders', [OrderController::class, 'listOrders'])->name('manufacturer.orders.list');
     Route::get('/manufacturer/order/{id}', [OrderController::class, 'showOrder'])->name('admin.order.show');
     Route::put('/manufacturer/order/{id}', [OrderController::class, 'updateOrderStatus'])->name('admin.order.update');
 });

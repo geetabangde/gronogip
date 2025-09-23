@@ -10,53 +10,53 @@ use Illuminate\Support\Facades\Auth;
 class CartController extends Controller
 {
     // Add to Cart
-    public function addToCart(Request $request)
-   {
-    $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'quantity'   => 'nullable|integer|min:1'
-    ]);
+        public function addToCart(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity'   => 'nullable|integer|min:1'
+        ]);
 
-    $product = Product::findOrFail($request->product_id);
+        $product = Product::findOrFail($request->product_id);
 
-    // Requested quantity
-    $requestedQty = $request->quantity ?? 1;
+        // Requested quantity
+        $requestedQty = $request->quantity ?? 1;
 
-    // Check stock availability
-    if ($product->quantity < $requestedQty) {
+        // Check stock availability
+        if ($product->quantity < $requestedQty) {
+            return response()->json([
+                'message' => 'Only ' . $product->quantity . ' Quantity available in product',
+            ], 400);
+        }
+
+        // Check manufacturer consistency
+        $existingCart = Cart::where('user_id', Auth::id())->first();
+        if ($existingCart && $existingCart->manufacturer_id !== $product->manufacturer_id) {
+            return response()->json([
+                'message' => 'You can only add products from one manufacturer at a time.',
+            ], 400);
+        }
+
+        // Update or create cart
+        $cart = Cart::updateOrCreate(
+            [
+                'user_id'        => Auth::id(),
+                'product_id'     => $product->id,
+            ],
+            [
+                'quantity'       => $requestedQty,
+                'manufacturer_id'=> $product->manufacturer_id, // ✅ manufacturer set
+            ]
+        );
+
+        // Decrease stock from product table
+        $product->decrement('quantity', $requestedQty);
+
         return response()->json([
-            'message' => 'Only ' . $product->quantity . ' Quantity available in product',
-        ], 400);
+            'message' => 'Product added to cart successfully',
+            'data'    => $cart->load('product')
+        ], 201);
     }
-
-    // Check manufacturer consistency
-    $existingCart = Cart::where('user_id', Auth::id())->first();
-    if ($existingCart && $existingCart->manufacturer_id !== $product->manufacturer_id) {
-        return response()->json([
-            'message' => 'You can only add products from one manufacturer at a time.',
-        ], 400);
-    }
-
-    // Update or create cart
-    $cart = Cart::updateOrCreate(
-        [
-            'user_id'        => Auth::id(),
-            'product_id'     => $product->id,
-        ],
-        [
-            'quantity'       => $requestedQty,
-            'manufacturer_id'=> $product->manufacturer_id, // ✅ manufacturer set
-        ]
-    );
-
-    // Decrease stock from product table
-    $product->decrement('quantity', $requestedQty);
-
-    return response()->json([
-        'message' => 'Product added to cart successfully',
-        'data'    => $cart->load('product')
-    ], 201);
-}
 
 
     public function updateCart(Request $request, $id)

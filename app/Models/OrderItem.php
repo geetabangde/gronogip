@@ -19,8 +19,10 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
-    public function manufacturer() {
-       return $this->belongsTo(Admin::class, 'manufacturer_id');
+
+   public function manufacturer()
+   {
+      return $this->belongsTo(Admin::class, 'manufacturer_id', 'id');
    }
 
 

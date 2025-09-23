@@ -25,6 +25,9 @@ Route::middleware(['auth:sanctum'])->group(function (){
     Route::post('update-profile', [ApiController::class, 'updateProfile']);
     Route::post('create-qr', [QRCodeController::class, 'create']);
     Route::get('fetch-qr', [QRCodeController::class, 'fetchAll']);
+    Route::get('qr/{id}/payments', [QRCodeController::class, 'fetchPaymentsForQR']);
+
+    Route::get('payments', [QRCodeController::class, 'fetchAllPayments']);
     // Manufacturers list  
     Route::get('manufacturers', [ManufacturerController::class, 'manufacturersList']); 
 

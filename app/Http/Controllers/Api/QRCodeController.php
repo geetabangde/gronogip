@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\QRCode;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 class QRCodeController extends Controller
 {
@@ -98,6 +99,77 @@ class QRCodeController extends Controller
         return response()->json([
             'success' => true,
             'qr_codes' => $data
+        ]);
+    }
+    public function fetchPaymentsForQR(Request $request, $id)
+   {
+        $keyId = env('RAZORPAY_KEY_ID');
+        $keySecret = env('RAZORPAY_KEY_SECRET');
+
+        // Query params
+         $from  = $request->get('from') ? strtotime($request->get('from')) : Carbon::now()->subDays(30)->timestamp;
+        $to    = $request->get('to')   ? strtotime($request->get('to'))   : Carbon::now()->timestamp;
+        $count = $request->get('count', 10);
+        $skip  = $request->get('skip', 0);
+
+        $query = [
+            'count' => $count,
+            'skip'  => $skip,
+        ];
+
+        if ($from) $query['from'] = $from;
+        if ($to)   $query['to']   = $to;
+
+        $url = "https://api.razorpay.com/v1/payments/qr_codes/{$id}/payments";
+
+        $response = Http::withBasicAuth($keyId, $keySecret)->get($url, $query);
+
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => $response->body()
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'payments' => $response->json()
+        ]);
+   }
+
+
+    public function fetchAllPayments(Request $request)
+    {
+        $keyId = env('RAZORPAY_KEY_ID');
+        $keySecret = env('RAZORPAY_KEY_SECRET');
+
+        // Query parameters (defaults)
+        // Convert normal date to UNIX timestamp
+        $from = strtotime($request->get('from', '2025-09-01')); 
+        $to   = strtotime($request->get('to', '2025-09-23')); 
+        $count = $request->get('count', 10);
+        $skip  = $request->get('skip', 0);
+
+        $response = Http::withBasicAuth($keyId, $keySecret)
+            ->get('https://api.razorpay.com/v1/payments', [
+                'from'  => $from,
+                'to'    => $to,
+                'count' => $count,
+                'skip'  => $skip,
+            ]);
+
+        if ($response->failed()) {
+            return response()->json([
+                'success' => false,
+                'message' => $response->body(),
+            ], 400);
+        }
+
+        $data = $response->json();
+
+        return response()->json([
+            'success' => true,
+            'payments' => $data
         ]);
     }
 }
