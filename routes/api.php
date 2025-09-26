@@ -20,13 +20,15 @@ Route::post('login', [ApiController::class, 'loginWithMobile']);
 
 
 Route::middleware(['auth:sanctum'])->group(function (){
+    Route::post('create-qr', [QRCodeController::class, 'create']);
+    Route::get('qr/{id}/payments', [QRCodeController::class, 'fetchPaymentsForQR']);
     Route::post('logout', [ApiController::class, 'logout']);
     Route::get('profile', [ApiController::class, 'profile']);
     Route::post('update-profile', [ApiController::class, 'updateProfile']);
-    Route::post('create-qr', [QRCodeController::class, 'create']);
-    Route::get('fetch-qr', [QRCodeController::class, 'fetchAll']);
-    Route::get('qr/{id}/payments', [QRCodeController::class, 'fetchPaymentsForQR']);
+    
 
+
+    Route::get('fetch-qr', [QRCodeController::class, 'fetchAll']);
     Route::get('payments', [QRCodeController::class, 'fetchAllPayments']);
     // Manufacturers list  
     Route::get('manufacturers', [ManufacturerController::class, 'manufacturersList']); 

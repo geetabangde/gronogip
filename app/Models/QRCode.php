@@ -30,4 +30,9 @@ class QRCode extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function payments()
+    {
+        return $this->hasMany(QRPayment::class, 'qr_code_id');
+    }
+
 }

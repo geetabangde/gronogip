@@ -24,6 +24,7 @@ Route::middleware(['auth:admin', CheckRole::class . ':1,'])->group(function () {
     Route::get('/admin/brands', [AdminDashboardController::class, 'listBrands'])->name('admin.brand.list');
     Route::get('/admin/products', [AdminDashboardController::class, 'listProducts'])->name('admin.product.list');
     Route::get('/admin/orders', [AdminDashboardController::class, 'listOrders'])->name('admin.order.list');
+    Route::get('/admin/history', [AdminDashboardController::class, 'History'])->name('admin.history.list');
     Route::get('/admin/manufacturers', [AdminDashboardController::class, 'listManufacturers'])->name('admin.manufacturers.list');
     Route::delete('/admin/manufacturer/{id}', [AdminDashboardController::class,'deleteManufacturer'])->name('admin.manufacturer.delete');
     Route::get('/admin/manufacturers/create', [AdminDashboardController::class,'createManufacturer'])->name('admin.manufacturers.create'); 

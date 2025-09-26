@@ -12,6 +12,7 @@ use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
@@ -26,6 +27,27 @@ class AdminDashboardController extends Controller
     $brands = Brand::with('manufacturer')->get();
     return view('admin.brands.list', compact('brands'));
    }
+
+    //    History
+    public function History()
+    {
+        // Fetch all payments with QR info
+        $payments = DB::table('qr_payments')
+            ->join('q_r_codes', 'qr_payments.qr_code_id', '=', 'q_r_codes.id')
+            ->select(
+                'qr_payments.*',
+                'q_r_codes.razorpay_qr_id',
+                'q_r_codes.description',
+                 'q_r_codes.image_url'
+            )
+            ->orderBy('qr_payments.paid_at', 'desc')
+            ->get();
+
+            
+
+        return view('admin.history.list', compact('payments'));
+    }
+
    //    order list
     public function listOrders()
    {

@@ -46,6 +46,13 @@
                             <span data-key="t-order">Order</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('admin.history.list') }}">
+                            <i data-feather="clock"></i>
+                            <span data-key="t-history">History</span>
+                        </a>
+                    </li>
+                
                 @endif
 
                 <!-- only for retailer -->
